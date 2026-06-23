@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OralNSight - Oral Health Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Root Variables for Pastel Purple Theme --- */
+        :root {
+            --bg-color: #f7f5fa;
+            --primary-purple: #7a4b9e;
+            --light-purple: #ebdffa;
+            --dark-purple: #4a2866;
+            --white: #ffffff;
+            --text-dark: #222222;
+            --text-muted: #555555;
+            --shadow: 0 4px 15px rgba(122, 75, 158, 0.08);
+            --transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --warning-bg: rgba(246, 242, 250, 0.96);
+            --success-green: #2b8a51;
+            --error-red: #b23b3b;
+        }
+
+        /* --- Global Resets --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation Bar --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;                  
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo img {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--dark-purple);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 15px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links li.active > a {
+            color: var(--primary-purple);
+            background-color: var(--light-purple);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown { position: relative; }
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            min-width: 180px;
+            padding: 10px 0;
+            margin-top: 5px;
+            border: 1px solid var(--light-purple);
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            border-radius: 0;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: var(--light-purple);
+            color: var(--dark-purple);
+        }
+
+        /* --- Section Configurations --- */
+        section {
+            padding: 100px 20px 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            min-height: calc(100vh - 140px); 
+            display: none;
+        }
+
+        section.active-section {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        /* --- Home Section --- */
+        #home {
+            max-width: 100% !important;
+            padding: 0 !important;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            display: none;
+        }
+
+        #home.active-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0,0,0,0.15); 
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 850px;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 46px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-hero {
+            display: inline-block;
+            background-color: var(--primary-purple);
+            color: var(--white);
+            padding: 14px 40px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-hero:hover {
+            background-color: var(--dark-purple);
+            transform: translateY(-2px);
+        }
+
+        /* --- Grid & Universal Components --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(122, 75, 158, 0.08);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(122, 75, 158, 0.12);
+        }
+
+        /* --- Master-Detail Split Layout for Diseases --- */
+        .split-explorer {
+            display: flex;
+            gap: 30px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(122, 75, 158, 0.1);
+            overflow: hidden;
+            min-height: 650px;
+            margin-top: 20px;
+        }
+
+        .explorer-sidebar {
+            width: 320px;
+            background-color: #fbf9fc;
+            border-right: 1px solid var(--light-purple);
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            background-color: rgba(122, 75, 158, 0.05);
+            color: var(--primary-purple);
+        }
+
+        .menu-item.active-menu {
+            background-color: var(--primary-purple);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(122, 75, 158, 0.2);
+        }
+
+        .explorer-content {
+            flex: 1;
+            padding: 40px;
+            position: relative;
+        }
+
+        .disease-panel {
+            display: none;
+        }
+
+        .disease-panel.active-panel {
+            display: block;
+        }
+
+        .disease-panel h3 {
+            font-size: 28px;
+            color: var(--dark-purple);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .disease-overview {
+            font-size: 16px;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-purple);
+        }
+
+        /* --- Information Matrix Blocks --- */
+        .info-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .matrix-block {
+            background-color: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(122, 75, 158, 0.1);
+            overflow: hidden;
+            position: relative;
+            height: 250px;
+            transition: var(--transition);
+        }
+
+        .matrix-image-header {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .matrix-image-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .static-top-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 4;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .risk-label { background: #b23b3b; border: 1px solid rgba(255,255,255,0.2); }
+        .effects-label { background: #d97706; border: 1px solid rgba(255,255,255,0.2); }
+        .treatment-label { background: #2b8a51; border: 1px solid rgba(255,255,255,0.2); }
+
+        .matrix-card-body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.82); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 25px;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0; 
+            transition: opacity 0.35s ease-in-out;
+        }
+
+        .matrix-block:hover .matrix-image-header img { transform: scale(1.05); }
+        .matrix-block:hover .matrix-card-body { opacity: 1; }
+
+        .matrix-text {
+            font-size: 14px;
+            color: #111111;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        
+        .matrix-text strong {
+            color: var(--dark-purple);
+            font-size: 15px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* --- Clinical Case Gallery --- */
+        .clinical-gallery-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin: 40px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explorer-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        .explorer-gallery .img-wrapper {
+            position: relative;
+            width: 100%;          
+            height: 240px;         
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            background-color: #eee;
+            border: 1px solid var(--light-purple);
+        }
+
+        .explorer-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;    
+            filter: blur(25px);
+            transition: filter 0.4s ease;
+        }
+
+        .trigger-warning {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--warning-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: opacity 0.4s ease;
+        }
+
+        .trigger-warning span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #b83232;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .view-btn {
+            background: var(--primary-purple);
+            color: var(--white);
+            border: none;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .hide-photo-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            border: none;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 5;
+            display: none; 
+            transition: var(--transition);
+        }
+        
+        .img-wrapper.revealed img { filter: blur(0); }
+        .img-wrapper.revealed .trigger-warning { opacity: 0; pointer-events: none; }
+        .img-wrapper.revealed .hide-photo-btn { display: block; }
+
+        /* --- Dashboard --- */
+        .dashboard-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--light-purple);
+            width: 100%;
+            height: 700px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .dashboard-container iframe { width: 100%; height: 100%; border: none; }
+
+        /* --- About Section Showcase --- */
+        .profile-showcase-container {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 40px;
+            margin: 30px auto;
+            align-items: start;
+        }
+
+        .developer-sidebar-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 35px 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid rgba(122, 75, 158, 0.06);
+            position: sticky;
+            top: 100px;
+        }
+
+        .avatar-frame {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--light-purple);
+        }
+
+        .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .dev-name { font-size: 20px; font-weight: 700; color: var(--dark-purple); margin-bottom: 4px; }
+        .dev-role { color: var(--primary-purple); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; }
+        .project-showcase-panel { background: var(--white); border-radius: 20px; padding: 40px; box-shadow: var(--shadow); border: 1px solid rgba(122, 75, 158, 0.06); }
+        .showcase-heading { font-size: 24px; font-weight: 700; color: var(--dark-purple); margin-bottom: 15px; border-bottom: 2px solid var(--light-purple); padding-bottom: 10px; }
+        .showcase-intro-text { font-size: 15px; color: var(--text-dark); margin-bottom: 30px; }
+
+        footer { background-color: var(--white); text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--light-purple); margin-top: auto; }
+
+        /* --- Responsive View Media Queries --- */
+        @media (max-width: 1024px) {
+            .split-explorer { flex-direction: column; min-height: auto; }
+            .explorer-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--light-purple); flex-direction: row; overflow-x: auto; padding: 15px; }
+            .menu-item { white-space: nowrap; padding: 10px 16px; }
+            .explorer-content { padding: 30px 20px; }
+            .profile-showcase-container { grid-template-columns: 1fr; gap: 25px; }
+            .developer-sidebar-card { position: relative; top: 0; }
+        }
+
+        @media (max-width: 768px) {
+            section { padding: 90px 15px 40px 15px; }
+            .navbar { padding: 12px 15px; }
+            .logo-text { font-size: 20px; }
+            .nav-links { gap: 10px; }
+            .nav-links a { font-size: 13px; padding: 6px 10px; }
+            .section-title { font-size: 26px; }
+            .hero-content h1 { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="navbar">
+            <a onclick="switchPage('home')" class="logo">
+                <img src="images/oralnsight_logo.png" alt="OralNSight Logo">
+                <span class="logo-text">OralNSight</span>
+            </a>
+            <ul class="nav-links">
+                <li id="nav-home" class="active"><a onclick="switchPage('home')">Home</a></li>
+                <li id="nav-edu" class="dropdown">
+                    <a>Education ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a onclick="switchPage('diseases')">Oral Diseases</a></li>
+                        <li><a onclick="switchPage('awareness')">Awareness Page</a></li>
+                    </ul>
+                </li>
+                <li id="nav-dashboard"><a onclick="switchPage('dashboard')">Dashboard</a></li>
+                <li id="nav-about"><a onclick="switchPage('about')">About Developer</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- HOME HERO SECTION -->
+    <section id="home" class="active-section">
+        <video class="video-background" autoplay loop muted playsinline>
+            <source src="video.MP4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+        <div class="hero-content">
+            <h1>Analysing Oral Health Issues Through Trend Analysis</h1>
+            <p>Providing interactive diagnostic intelligence, health tracking matrices, and analytical data visualization to advance global oral health awareness and trend modeling.</p>
+            <button class="btn-hero" onclick="switchPage('dashboard')">Explore Dashboard</button>
+        </div>
+    </section>
+
+    <!-- EXPLORER SECTION: COMMON ORAL DISEASES -->
+    <section id="diseases">
+        <h2 class="section-title">Common Oral Diseases</h2>
+        <p class="section-subtitle">Navigate the clinical profiles on the left to track pathological risk factors, effects, and modern treatment frameworks.</p>
+        
+        <div class="split-explorer">
+            <div class="explorer-sidebar">
+                <button class="menu-item active-menu" onclick="showDisease('periodontal', this)">Periodontal Disease</button>
+                <button class="menu-item" onclick="showDisease('permanent', this)">Caries of Permanent Teeth</button>
+                <button class="menu-item" onclick="showDisease('deciduous', this)">Caries of Deciduous Teeth</button>
+                <button class="menu-item" onclick="showDisease('edentulism', this)">Edentulism</button>
+                <button class="menu-item" onclick="showDisease('cancer', this)">Oral Cancer</button>
+            </div>
+
+            <div class="explorer-content">
+                <!-- PANEL: PERIODONTAL DISEASE -->
+                <div id="panel-periodontal" class="disease-panel active-panel">
+                    <h3>Periodontal Disease (Gum Disease)</h3>
+                    <p class="disease-overview">A serious swelling and infection of the gums that harms the soft tissue and bone supporting your teeth.</p>
+                    
+                    <div class="info-matrix">
+                        <div class="matrix-block">
+                            <span class="static-top-label risk-label">Risk Factors</span>
+                            <div class="matrix-image-header"><img src="images/brushing.png" alt="Periodontal Risks"></div>
+                            <div class="matrix-card-body">
+                                <div class="matrix-text"><strong>What triggers it?</strong>Not brushing or flossing enough, smoking tobacco, living with uncontrolled diabetes, or your family medical history.</div>
+                            </div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label effects-label">Effects & Impact</span>
+                            <div class="matrix-image-header"><img src="images/loose.png" alt="Periodontal Effects"></div>
+                            <div class="matrix-card-body">
+                                <div class="matrix-text"><strong>What does it do?</strong>It causes your gums to pull away from teeth, triggers painful bleeding, creates bad breath, and makes teeth loose over time.</div>
+                            </div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label treatment-label">Treatments</span>
+                            <div class="matrix-image-header"><img src="images/scalling.png" alt="Periodontal Treatments"></div>
+                            <div class="matrix-card-body">
+                                <div class="matrix-text"><strong>How do we fix it?</strong>Deep medical cleaning by a dentist (scaling), taking germ-killing medicines, or having gum surgery for bad infections.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="clinical-gallery-header">📸 Associated Clinical Case Studies</h4>
+                    <div class="explorer-gallery">
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/periodontal.png"></div>
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/periodontal_2.png"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL: PERMANENT CARIES -->
+                <div id="panel-permanent" class="disease-panel">
+                    <h3>Caries of Permanent Teeth (Adult Cavities)</h3>
+                    <p class="disease-overview">Permanent damage to the hard surface of your adult teeth that develops into tiny holes or openings.</p>
+                    <div class="info-matrix">
+                        <div class="matrix-block">
+                            <span class="static-top-label risk-label">Risk Factors</span>
+                            <div class="matrix-image-header"><img src="images/snacks.png" alt="Permanent Caries Risks"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What triggers it?</strong>Eating lots of sugary snacks, drinking sodas, missing your daily brushing sessions, and not using enough protective fluoride.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label effects-label">Effects & Impact</span>
+                            <div class="matrix-image-header"><img src="images/toothache2.png" alt="Permanent Caries Effects"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What does it do?</strong>It leads to sharp toothaches, infections under your gums, trouble chewing your food, and broken or cracked teeth.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label treatment-label">Treatments</span>
+                            <div class="matrix-image-header"><img src="images/rootcanal.png" alt="Permanent Caries Treatments"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>How do we fix it?</strong>Getting custom tooth fillings, root canal therapy to save dying teeth, placing protective caps (crowns), or removing the tooth.</div></div>
+                        </div>
+                    </div>
+                    <h4 class="clinical-gallery-header">📸 Associated Clinical Case Studies</h4>
+                    <div class="explorer-gallery">
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/permanent_caries.png"></div>
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/caries_1.jpeg"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL: DECIDUOUS CARIES -->
+                <div id="panel-deciduous" class="disease-panel">
+                    <h3>Caries of Deciduous Teeth (Baby Tooth Decay)</h3>
+                    <p class="disease-overview">Tooth decay and cavities that form inside the mouth of infants and young children's primary teeth.</p>
+                    <div class="info-matrix">
+                        <div class="matrix-block">
+                            <span class="static-top-label risk-label">Risk Factors</span>
+                            <div class="matrix-image-header"><img src="images/milk.png" alt="Deciduous Caries Risks"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What triggers it?</strong>Sleeping with bottles full of milk or sweet juice, coating pacifiers in sugar, or delaying early toddler dental checkups.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label effects-label">Effects & Impact</span>
+                            <div class="matrix-image-header"><img src="images/babytooth.png" alt="Deciduous Caries Effects"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What does it do?</strong>Losing baby teeth too early causes adult teeth to grow crooked, creates speech delays, and triggers poor nutrition habits.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label treatment-label">Treatments</span>
+                            <div class="matrix-image-header"><img src="images/babytreatment.png" alt="Deciduous Caries Treatments"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>How do we fix it?</strong>Applying protective fluoride gels, performing light pediatric root treatment, or utilizing protective space maintainer guards.</div></div>
+                        </div>
+                    </div>
+                    <h4 class="clinical-gallery-header">📸 Associated Clinical Case Studies</h4>
+                    <div class="explorer-gallery">
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/deciduous2.png"></div>
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/deciuous_caries.png"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL: EDENTULISM -->
+                <div id="panel-edentulism" class="disease-panel">
+                    <h3>Edentulism (Tooth Loss)</h3>
+                    <p class="disease-overview">The state of losing either several or all of your natural teeth, usually during your older adult years.</p>
+                    <div class="info-matrix">
+                        <div class="matrix-block">
+                            <span class="static-top-label risk-label">Risk Factors</span>
+                            <div class="matrix-image-header"><img src="images/access.png" alt="Edentulism Risks"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What triggers it?</strong>Ignoring long-term cavities, severe unresolved gum disease, heavy physical mouth injuries, or lacking access to dental care.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label effects-label">Effects & Impact</span>
+                            <div class="matrix-image-header"><img src="images/jawbone.png" alt="Edentulism Effects"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What does it do?</strong>Causes severe difficulty chewing or speaking clearly, creates facial sagging patterns, and directly degrades systemic digestive health over time.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label treatment-label">Treatments</span>
+                            <div class="matrix-image-header"><img src="images/bridges.png" alt="Edentulism Treatments"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>How do we fix it?</strong>Fitting partial or complete removable dentures, crafting secure dental bridges, or installing modern titanium dental implants.</div></div>
+                        </div>
+                    </div>
+                    <h4 class="clinical-gallery-header">📸 Associated Clinical Case Studies</h4>
+                    <div class="explorer-gallery">
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/edentulism_1.png"></div>
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/edentulism_2.png"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL: ORAL CANCER -->
+                <div id="panel-cancer" class="disease-panel">
+                    <h3>Oral Cancer</h3>
+                    <p class="disease-overview">Dangerous and abnormal cell growths that show up inside your lips, tongue linings, or throat surfaces.</p>
+                    <div class="info-matrix">
+                        <div class="matrix-block">
+                            <span class="static-top-label risk-label">Risk Factors</span>
+                            <div class="matrix-image-header"><img src="images/tobacco.png" alt="Oral Cancer Risks"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What triggers it?</strong>Heavy smoking or chewing tobacco products, frequent high consumption of alcohol, or exposure to the HPV virus.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label effects-label">Effects & Impact</span>
+                            <div class="matrix-image-header"><img src="images/swallow.png" alt="Oral Cancer Effects"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>What does it do?</strong>Creates painful non-healing ulcers, visible red or white tissue patches, challenges swallowing food, and endangers life via tumor metastasis.</div></div>
+                        </div>
+                        <div class="matrix-block">
+                            <span class="static-top-label treatment-label">Treatments</span>
+                            <div class="matrix-image-header"><img src="images/treatmentcancer.png" alt="Oral Cancer Treatments"></div>
+                            <div class="matrix-card-body"><div class="matrix-text"><strong>How do we fix it?</strong>Precision surgical tissue removal operations, aggressive target radiation therapy cycles, or medically supervised chemotherapy regimens.</div></div>
+                        </div>
+                    </div>
+                    <h4 class="clinical-gallery-header">📸 Associated Clinical Case Studies</h4>
+                    <div class="explorer-gallery">
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/cancer_1.jpeg"></div>
+                        <div class="img-wrapper"><button class="hide-photo-btn" onclick="hideImage(this)">Hide ✖</button><div class="trigger-warning"><span>⚠️ Clinical Image</span><button class="view-btn" onclick="revealImage(this)">View</button></div><img src="images/cancer_2.jpeg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AWARENESS PAGE SECTION -->
+    <section id="awareness">
+        <h2 class="section-title">Easy Steps for Healthy Teeth</h2>
+        <p class="section-subtitle">Simple, daily habits to protect your smile and avoid painful, expensive dental visits.</p>
+        
+        <h3 style="color: var(--dark-purple); margin: 30px 0 15px 0; font-size: 22px; text-align: center;">1. Your Daily Dental Routine</h3>
+        <div class="grid-container" style="margin-top: 0;">
+            
+            <div class="card" style="padding: 0; overflow: hidden; border-top: 4px solid var(--primary-purple); display: flex; flex-direction: column;">
+                <div style="width: 100%; height: 160px; background-color: #eee;">
+                    <img src="images/brush.png" alt="Brushing teeth" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 20px;">
+                    <h3 style="font-size: 18px; color: var(--dark-purple); margin-bottom: 8px;">The 2x2 Rule</h3>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.5;">Brush your teeth <strong>twice a day</strong> (morning and night) for <strong>2 full minutes</strong>. This cleans away sticky plaque before it turns into hard tartar that only a dentist can remove.</p>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden; border-top: 4px solid var(--primary-purple); display: flex; flex-direction: column;">
+                <div style="width: 100%; height: 160px; background-color: #eee;">
+                    <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&w=400" alt="Flossing teeth" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 20px;">
+                    <h3 style="font-size: 18px; color: var(--dark-purple); margin-bottom: 8px;">Clean Between Your Teeth</h3>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.5;">Use dental floss or a tiny interdental brush once a day. Normal toothbrushes miss about <strong>40% of your tooth surfaces</strong>—mostly the hidden spots where gum disease starts.</p>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden; border-top: 4px solid var(--primary-purple); display: flex; flex-direction: column;">
+                <div style="width: 100%; height: 160px; background-color: #eee;">
+                    <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=400" alt="Healthy food" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 20px;">
+                    <h3 style="font-size: 18px; color: var(--dark-purple); margin-bottom: 8px;">Watch the Sugar</h3>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.5;">Cut down on sugary snacks, sodas, and candies. Bacteria in your mouth eat sugar and create acid, which attacks your enamel and creates cavities.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border: 0; height: 1px; background: var(--light-purple); margin: 40px 0;">
+
+        <div style="background: var(--white); border-radius: 16px; padding: 35px; box-shadow: var(--shadow); margin-bottom: 40px; border: 1px solid rgba(122, 75, 158, 0.1);">
+            <h3 style="color: var(--dark-purple); margin-bottom: 10px; font-size: 22px; text-align: center;">2. What Happens If You Ignore Your Teeth?</h3>
+            <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Dental problems start small but get worse and more expensive very quickly.</p>
+            
+            <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                
+                <div style="flex: 1; min-width: 220px; background: #ffffff; border-radius: 12px; overflow: hidden; border-bottom: 4px solid #2b8a51; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="width: 100%; height: 150px; background-color: #ffffff; padding: 12px 12px 0 12px; display: flex; align-items: center; justify-content: center;">
+                        <img src="images/bleeding.png" alt="Early stage" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="padding: 15px; background: #ffffff; flex-grow: 1;">
+                        <span style="font-size: 11px; font-weight: 700; color: #2b8a51; text-transform: uppercase;">Stage 1: Warning</span>
+                        <h4 style="margin: 3px 0; font-size: 15px; color: var(--dark-purple);">Bleeding Gums</h4>
+                        <p style="font-size: 13px; color: var(--text-dark);">Gums bleed slightly when brushing. This is easily fixed with better cleaning and a dental checkup.</p>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 220px; background: #ffffff; border-radius: 12px; overflow: hidden; border-bottom: 4px solid #e08214; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="width: 100%; height: 150px; background-color: #ffffff; padding: 12px 12px 0 12px; display: flex; align-items: center; justify-content: center;">
+                        <img src="images/toothache.png" alt="Moderate stage" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="padding: 15px; background: #ffffff; flex-grow: 1;">
+                        <span style="font-size: 11px; font-weight: 700; color: #e08214; text-transform: uppercase;">Stage 2: Damage</span>
+                        <h4 style="margin: 3px 0; font-size: 15px; color: var(--dark-purple);">Tooth Decay & Pain</h4>
+                        <p style="font-size: 13px; color: var(--text-dark);">Holes (cavities) form in your teeth. You will need a filling or deep cleaning from the dentist to fix it.</p>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 220px; background: #ffffff; border-radius: 12px; overflow: hidden; border-bottom: 4px solid #c94a29; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="width: 100%; height: 150px; background-color: #ffffff; padding: 12px 12px 0 12px; display: flex; align-items: center; justify-content: center;">
+                        <img src="images/toothloss.png" alt="Severe stage" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="padding: 15px; background: #ffffff; flex-grow: 1;">
+                        <span style="font-size: 11px; font-weight: 700; color: #c94a29; text-transform: uppercase;">Stage 3: Loss</span>
+                        <h4 style="margin: 3px 0; font-size: 15px; color: var(--dark-purple);">Severe Pain & Tooth Loss</h4>
+                        <p style="font-size: 13px; color: var(--text-dark);">The tooth dies, or the bone holding it breaks down. Requires painful surgeries, root canals, or pulling the tooth out completely.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tiered Multi-Status Interactive Self-Check Quiz -->
+        <div class="card" style="max-width: 700px; margin: 40px auto 0 auto; text-align: left; border-top: 5px solid var(--primary-purple); padding: 30px; background: var(--white);">
+            <h3 style="color: var(--dark-purple); margin-bottom: 10px; font-size: 22px; text-align: center;">🚨 Quick Tooth Health Check</h3>
+            <p style="font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 25px;">Select any symptoms you have experienced recently to check your oral health status.</p>
+            
+            <div id="oral-quiz-form" style="display: flex; flex-direction: column; gap: 15px; max-width: 520px; margin: 0 auto;" tabindex="0">
+                
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: var(--bg-color); padding: 12px; border-radius: 8px; transition: var(--transition);">
+                    <input type="checkbox" class="quiz-symptom" onchange="toggleNoneOption(this)" style="accent-color: var(--primary-purple); width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span>My gums bleed slightly when I brush or floss my teeth.</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: var(--bg-color); padding: 12px; border-radius: 8px; transition: var(--transition);">
+                    <input type="checkbox" class="quiz-symptom" onchange="toggleNoneOption(this)" style="accent-color: var(--primary-purple); width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span>My teeth feel sharp pain or sensitivity when drinking cold or hot liquids.</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: var(--bg-color); padding: 12px; border-radius: 8px; transition: var(--transition);">
+                    <input type="checkbox" class="quiz-symptom" onchange="toggleNoneOption(this)" style="accent-color: var(--primary-purple); width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span>I notice bad breath or a bad taste in my mouth that won't go away.</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: var(--bg-color); padding: 12px; border-radius: 8px; transition: var(--transition);">
+                    <input type="checkbox" class="quiz-symptom" onchange="toggleNoneOption(this)" style="accent-color: var(--primary-purple); width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span>I feel a dull ache or constant pain in my teeth or jaw area.</span>
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: var(--bg-color); padding: 12px; border-radius: 8px; transition: var(--transition);">
+                    <input type="checkbox" class="quiz-symptom" onchange="toggleNoneOption(this)" style="accent-color: var(--primary-purple); width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span>One or more of my teeth feel loose or have shifted out of place.</span>
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-dark); cursor: pointer; background: rgba(43, 138, 81, 0.05); padding: 12px; border-radius: 8px; border: 1px dashed rgba(43, 138, 81, 0.3); transition: var(--transition);">
+                    <input type="checkbox" id="quiz-none-above" onchange="clearSymptoms(this)" style="accent-color: #2b8a51; width: 18px; height: 18px; flex-shrink: 0;"> 
+                    <span style="font-weight: 600; color: #2b8a51;">None of the above (My teeth feel healthy)</span>
+                </label>
+
+                <button type="button" onclick="calculateQuizResult()" style="background-color: var(--primary-purple); color: var(--white); border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: var(--transition); box-shadow: 0 4px 10px rgba(122, 75, 158, 0.15);">
+                    Check Status (or Press Enter)
+                </button>
+
+                <div id="quiz-result-banner" style="display: none; margin-top: 15px; padding: 20px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 15px; animation: fadeIn 0.4s ease; line-height: 1.5;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANALYTICS DASHBOARD SECTION -->
+    <section id="dashboard">
+        <h2 class="section-title">Interactive Analysis Dashboard</h2>
+        <div class="dashboard-container">
+            <iframe title="oralNsight" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiY2U4MDM4ZmYtYzI2NS00ZThlLTg0ZmItYjk1NzJlMDVkNDJjIiwidCI6ImNkY2JiMGUyLTlmZWEtNGY1NC04NjcwLTY3MjcwNzc5N2FkYSIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>
+        </div>
+    </section>
+
+    <!-- ABOUT DEVELOPER SECTION -->
+    <!-- ABOUT DEVELOPER SECTION -->
+    <section id="about">
+        <h2 class="section-title">Developer & Project Profile</h2>
+        <p class="section-subtitle">Discover the strategic foundations, methodology, and engineering mind behind OralNSight.</p>
+        
+        <div class="profile-showcase-container">
+            <!-- Left Sticky Card: Developer Information -->
+            <div class="developer-sidebar-card">
+                <div class="avatar-frame">
+                    <img src="images/passport.jpg" alt="Nur Farhah Izzany Binti Robidan Profile Picture">
+                </div>
+                <h3 class="dev-name">Nur Farhah Izzany Binti Robidan</h3>
+                <p class="dev-role">Final Year Student / Developer</p>
+                <p class="dev-bio">Passionate about leveraging modern data engineering, clinical analytics, and business intelligence pipelines to optimize community healthcare outcomes.</p>
+                
+                <div class="meta-pill-box" style="margin-top: 20px; text-align: left;">
+                    <div class="meta-row" style="margin-bottom: 12px; border-bottom: 1px dashed var(--light-purple); padding-bottom: 8px;">
+                        <span class="meta-label" style="display: block; font-size: 11px; font-weight: 700; color: var(--primary-purple); text-transform: uppercase;">Academic Faculty</span>
+                        <span class="meta-value" style="font-size: 13px; color: var(--text-dark); font-weight: 500;">Computer Science and Information Technology</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label" style="display: block; font-size: 11px; font-weight: 700; color: var(--primary-purple); text-transform: uppercase;">Core Engineering Stack</span>
+                        <span class="meta-value" style="font-size: 13px; color: var(--text-dark); font-weight: 500;">PowerBI Ecosystem, HTML5, CSS3 Architecture, JavaScript (ES6+)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Strategic Project Purpose & Layout Content -->
+            <div class="project-showcase-panel">
+                <h3 class="showcase-heading">Project Purpose & Ecosystem</h3>
+                <p class="showcase-intro-text" style="font-size: 15px; line-height: 1.7; color: var(--text-dark);">
+                    Oral diseases remain a foundational public health issue globally, frequently hidden by a deficit of actionable epidemiological insight and public diagnostic accessibility. <strong>OralNSight</strong> targets this analytical gap by ingesting highly dense, multi-faceted clinical health matrices and deploying them as intuitive, interactive intelligence modules.
+                </p>
+
+                <h3 class="showcase-heading" style="margin-top: 40px;">Core Engineering Objectives</h3>
+                <div class="objective-stream" style="display: flex; flex-direction: column; gap: 20px; margin-top: 15px;">
+                    <div class="objective-row-card" style="background: var(--bg-color); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-purple);">
+                        <h4 class="objective-row-title" style="color: var(--dark-purple); font-size: 16px; margin-bottom: 6px; font-weight: 600;">Demographic Trend Modeling</h4>
+                        <p class="objective-row-desc" style="font-size: 14px; color: var(--text-dark); margin: 0;">Extracting, processing, and visualising subtle chronological mutations in disease distribution patterns across varied socioeconomic profiles, distinct generational age bounds, and diverse gender landscapes.</p>
+                    </div>
+                    <div class="objective-row-card" style="background: var(--bg-color); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-purple);">
+                        <h4 class="objective-row-title" style="color: var(--dark-purple); font-size: 16px; margin-bottom: 6px; font-weight: 600;">Socioeconomic Operational Insights</h4>
+                        <p class="objective-row-desc" style="font-size: 14px; color: var(--text-dark); margin: 0;">Mapping treatment financing allocations and evaluating systemic stress constraints applied against active healthcare system configurations.</p>
+                    </div>
+                    <div class="objective-row-card" style="background: var(--bg-color); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-purple);">
+                        <h4 class="objective-row-title" style="color: var(--dark-purple); font-size: 16px; margin-bottom: 6px; font-weight: 600;">Preventative Clinical Advocacy</h4>
+                        <p class="objective-row-desc" style="font-size: 14px; color: var(--text-dark); margin: 0;">Minimizing structural therapeutic dependencies across general patient populations by embedding clear risk identifiers and active public health awareness metrics.</p>
+                    </div>
+                </div>
+
+                <div class="showcase-footer-callout" style="margin-top: 35px; background-color: rgba(122, 75, 158, 0.05); border: 1px dashed var(--light-purple); padding: 20px; border-radius: 12px; font-size: 14px; color: var(--dark-purple); line-height: 1.6;">
+                    <strong>Architectural Note:</strong> This visual analytics framework stands as an open-ended framework for modern public health dashboard development, designed to streamline raw clinical rows into functional answers for medical professionals and everyday citizens alike.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 OralNSight - All Rights Reserved | Final Year Project Submission</p>
+    </footer>
+
+    <script>
+        // Page Navigation Controller
+        function switchPage(sectionId) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(sec => sec.classList.remove('active-section'));
+
+            const activeSection = document.getElementById(sectionId);
+            if(activeSection) activeSection.classList.add('active-section');
+
+            document.querySelectorAll('.nav-links > li').forEach(li => li.classList.remove('active'));
+
+            if(sectionId === 'home') document.getElementById('nav-home').classList.add('active');
+            if(sectionId === 'diseases' || sectionId === 'awareness') document.getElementById('nav-edu').classList.add('active');
+            if(sectionId === 'dashboard') document.getElementById('nav-dashboard').classList.add('active');
+            if(sectionId === 'about') document.getElementById('nav-about').classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Split-Pane Disease Controller
+        function showDisease(diseaseKey, buttonElement) {
+            document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active-menu'));
+            document.querySelectorAll('.disease-panel').forEach(panel => panel.classList.remove('active-panel'));
+            
+            buttonElement.classList.add('active-menu');
+            document.getElementById(`panel-${diseaseKey}`).classList.add('active-panel');
+        }
+
+        // Warning Display Controls
+        function revealImage(button) {
+            const wrapper = button.closest('.img-wrapper');
+            if(wrapper) wrapper.classList.add('revealed');
+        }
+
+        function hideImage(button) {
+            const wrapper = button.closest('.img-wrapper');
+            if(wrapper) wrapper.classList.remove('revealed');
+        }
+
+        /* --- Custom Symptom Quiz Interactive Actions --- */
+        function toggleNoneOption(checkbox) {
+            if (checkbox.checked) {
+                document.getElementById('quiz-none-above').checked = false;
+            }
+        }
+
+        // Listen for "Enter" key press within the quiz container
+        document.getElementById('oral-quiz-form').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                calculateQuizResult();
+            }
+        }); 
+    </script>
+</body>
+</html>
